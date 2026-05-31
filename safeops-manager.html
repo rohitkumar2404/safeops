@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SafeOps — Manager Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0d1117;--bg3:#1c2030;
+--panel:#111520;--card:#181d2a;--card2:#1e2436;
+--border:#242b3d;--border2:#2e3750;
+--text:#dde3f0;--text2:#7a85a3;--text3:#4a5270;
+--accent:#3b82f6;--accent2:#06b6d4;--accent3:#f97316;
+--warn:#eab308;--danger:#ef4444;--success:#22c55e;
+--purple:#a855f7;--teal:#14b8a6;
+--font-head:'Syne',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);display:flex;height:100vh}
+
+/* SIDEBAR */
+#sidebar{width:230px;min-width:230px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-logo-mark{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-mark i{color:#fff;font-size:18px}
+.sb-logo-text{font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--text)}
+.sb-logo-text span{color:var(--accent)}
+.sb-context{margin:10px 10px 0;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 12px}
+.sb-context-label{font-size:9px;font-family:var(--font-mono);color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px}
+.sb-context-val{font-size:12px;color:var(--text);font-weight:500}
+.sb-context-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.sb-section{padding:14px 10px 4px;font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:0.14em;text-transform:uppercase}
+.sb-nav{flex:1;overflow-y:auto;padding-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px;margin:1px 6px;border-radius:7px;cursor:pointer;transition:all 0.15s;font-size:13px;color:var(--text2);position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,0.12);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-item i{font-size:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;font-family:var(--font-mono);padding:1px 7px;border-radius:10px;font-weight:500}
+.nb-red{background:rgba(239,68,68,0.2);color:var(--danger)}
+.nb-yellow{background:rgba(234,179,8,0.2);color:var(--warn)}
+.nb-blue{background:rgba(59,130,246,0.2);color:var(--accent)}
+.sb-bottom{padding:10px 8px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background 0.15s}
+.sb-user:hover{background:var(--bg3)}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--font-head)}
+.user-name{font-size:12px;font-weight:500;color:var(--text)}
+.user-role{font-size:10px;color:var(--text3);font-family:var(--font-mono)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;min-height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px}
+.page-title{font-family:var(--font-head);font-size:16px;font-weight:600;color:var(--text)}
+.breadcrumb{font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-left:4px}
+.topbar-search{flex:1;max-width:280px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;margin-left:12px}
+.topbar-search i{color:var(--text3);font-size:14px}
+.topbar-search input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;font-family:var(--font-body)}
+.topbar-search input::placeholder{color:var(--text3)}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;color:var(--text2);position:relative}
+.icon-btn:hover{background:var(--card);color:var(--text)}
+.notif-dot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:var(--danger);border-radius:50%;border:1.5px solid var(--panel)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:var(--font-body);border:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--card);color:var(--text)}
+.btn-danger-outline{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.3)}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+.page-content{flex:1;overflow-y:auto;padding:20px}
+.page-content::-webkit-scrollbar{width:4px}
+.page-content::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* SCOPE BANNER */
+.scope-banner{display:flex;align-items:center;gap:10px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:9px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:var(--text2)}
+.scope-banner i{color:var(--accent);font-size:16px;flex-shrink:0}
+.scope-pill{background:rgba(59,130,246,0.15);color:var(--accent);padding:2px 9px;border-radius:20px;font-size:11px;font-family:var(--font-mono)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--text)}
+.card-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:15px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.kpi:hover{border-color:var(--border2)}
+.kpi-accent{position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-label{font-size:10px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.kpi-value{font-family:var(--font-head);font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.kpi-up{color:var(--success)}
+.kpi-down{color:var(--danger)}
+.kpi-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:34px;opacity:0.12}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-family:var(--font-mono);font-weight:500}
+.b-success{background:rgba(34,197,94,0.12);color:var(--success)}
+.b-warn{background:rgba(234,179,8,0.12);color:var(--warn)}
+.b-danger{background:rgba(239,68,68,0.12);color:var(--danger)}
+.b-info{background:rgba(59,130,246,0.12);color:var(--accent)}
+.b-purple{background:rgba(168,85,247,0.12);color:var(--purple)}
+.b-teal{background:rgba(20,184,166,0.12);color:var(--teal)}
+.b-neutral{background:var(--bg3);color:var(--text2)}
+.b-orange{background:rgba(249,115,22,0.12);color:var(--accent3)}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;padding:8px 12px;color:var(--text3);font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border);font-weight:500}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,0.015)}
+.td-p{color:var(--text);font-weight:500}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:var(--font-mono)}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:90px;margin:8px 0}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:3px 3px 0 0;min-height:3px}
+.bar-label{font-size:9px;color:var(--text3);font-family:var(--font-mono)}
+
+/* PROGRESS */
+.prog-bar{height:4px;background:var(--bg3);border-radius:10px;overflow:hidden;margin-top:5px}
+.prog-fill{height:100%;border-radius:10px}
+
+/* ACTIVITY */
+.act-list{display:flex;flex-direction:column}
+.act-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.act-info{flex:1;min-width:0}
+.act-title{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-meta{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px}
+
+/* STAT ROW */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{font-size:12px;color:var(--text2)}
+.stat-val{font-size:12px;font-family:var(--font-mono);color:var(--text);font-weight:500}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{font-size:10px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{appearance:none;cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* MEMBER CARD */
+.member-card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.15s}
+.member-card:hover{border-color:var(--border2)}
+
+/* CHIP */
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all 0.15s;font-family:var(--font-mono)}
+.chip.sel{background:rgba(59,130,246,0.1);color:var(--accent);border-color:rgba(59,130,246,0.3)}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:5px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* TOGGLE */
+.toggle{width:34px;height:18px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.toggle.on{background:var(--accent);border-color:var(--accent)}
+.toggle::after{content:'';position:absolute;width:12px;height:12px;background:white;border-radius:50%;top:2px;left:2px;transition:left 0.2s}
+.toggle.on::after{left:18px}
+
+/* PROFILE MODAL */
+#profile-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+#profile-modal.open{display:flex}
+.modal-box{background:var(--card2);border:1px solid var(--border2);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:modalIn 0.2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.modal-header{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:var(--font-head);font-size:15px;font-weight:600;color:var(--text)}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:16px;transition:all 0.15s}
+.modal-close:hover{color:var(--text);border-color:var(--border2)}
+.modal-body{padding:20px}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px}
+.modal-tab{padding:7px 14px;font-size:11px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:var(--font-mono)}
+.modal-tab:hover{color:var(--text2)}
+.modal-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* PROFILE AVATAR BIG */
+.profile-hero{display:flex;align-items:center;gap:16px;padding:16px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;margin-bottom:18px}
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;background:rgba(59,130,246,0.2);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:var(--font-head);flex-shrink:0;border:2px solid rgba(59,130,246,0.4)}
+.profile-name{font-family:var(--font-head);font-size:16px;font-weight:600;color:var(--text)}
+.profile-role-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(59,130,246,0.12);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--font-mono);margin-top:4px}
+.profile-dept{font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:3px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--accent);border-radius:9px;padding:11px 16px;font-size:12px;color:var(--text);z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:slideUp 0.2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-view{animation:fadeIn 0.2s ease}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border)}
+</style>
+</head>
+<body>
+
+<!-- PROFILE MODAL -->
+<div id="profile-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">My Profile</div>
+      <div class="modal-close" onclick="closeProfile()"><i class="ti ti-x"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs" id="profile-tabs">
+        <div class="modal-tab active" data-ptab="info">Profile Info</div>
+        <div class="modal-tab" data-ptab="security">Security</div>
+        <div class="modal-tab" data-ptab="preferences">Preferences</div>
+        <div class="modal-tab" data-ptab="activity">Activity</div>
+      </div>
+      <div id="profile-tab-content"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark"><i class="ti ti-shield-check"></i></div>
+    <div class="sb-logo-text">Safe<span>Ops</span></div>
+  </div>
+  <div class="sb-context">
+    <div class="sb-context-label">Your Scope</div>
+    <div class="sb-context-val">Operations Dept.</div>
+    <div class="sb-context-sub">Warehouse B · Building C · Bay 1–5</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <div class="nav-item active" data-page="dashboard"><i class="ti ti-layout-dashboard"></i>My Dashboard</div>
+    <div class="nav-item" data-page="myteam"><i class="ti ti-users"></i>My Team</div>
+    <div class="sb-section">Work</div>
+    <div class="nav-item" data-page="inspections"><i class="ti ti-clipboard-check"></i>Inspections<span class="nav-badge nb-blue">8</span></div>
+    <div class="nav-item" data-page="tasks"><i class="ti ti-checklist"></i>Tasks<span class="nav-badge nb-yellow">4</span></div>
+    <div class="nav-item" data-page="incidents"><i class="ti ti-alert-triangle"></i>Incidents<span class="nav-badge nb-red">2</span></div>
+    <div class="nav-item" data-page="assets"><i class="ti ti-tools"></i>Assets</div>
+    <div class="sb-section">Reports</div>
+    <div class="nav-item" data-page="reports"><i class="ti ti-chart-bar"></i>My Reports</div>
+    <div class="nav-item" data-page="notifications"><i class="ti ti-bell"></i>Notifications<span class="nav-badge nb-red">5</span></div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-user" onclick="openProfile()">
+      <div class="avatar" style="background:rgba(59,130,246,0.2);color:var(--accent)">AS</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name">Arjun Singh</div>
+        <div class="user-role">Manager · Operations</div>
+      </div>
+      <i class="ti ti-settings" style="color:var(--text3);font-size:14px"></i>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <div class="page-title" id="page-title">My Dashboard</div>
+      <div class="breadcrumb" id="breadcrumb">Operations · Warehouse B</div>
+    </div>
+    <div class="topbar-search"><i class="ti ti-search"></i><input placeholder="Search in my department…"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" style="position:relative" onclick="navigate('notifications')"><i class="ti ti-bell" style="font-size:16px"></i><span class="notif-dot"></span></div>
+      <div class="icon-btn" onclick="openProfile()" title="My Profile"><i class="ti ti-user-circle" style="font-size:16px"></i></div>
+      <button class="btn btn-primary" id="primary-btn"><i class="ti ti-plus" style="font-size:13px"></i><span id="primary-btn-label">New Task</span></button>
+    </div>
+  </div>
+  <div class="page-content" id="page-content"></div>
+</div>
+
+<script>
+let cur='dashboard';
+const cfg={
+  dashboard:{title:'My Dashboard',bc:'Operations · Warehouse B',btn:'New Task'},
+  myteam:{title:'My Team',bc:'Operations Dept.',btn:'Assign Task'},
+  inspections:{title:'Inspections',bc:'My Department Only',btn:'Schedule Inspection'},
+  tasks:{title:'Tasks',bc:'My Department Only',btn:'Create Task'},
+  incidents:{title:'Incidents',bc:'My Department Only',btn:'Report Incident'},
+  assets:{title:'Assets',bc:'Warehouse B · Bay 1–5',btn:'Log Maintenance'},
+  reports:{title:'My Reports',bc:'Operations Dept.',btn:'Export Report'},
+  notifications:{title:'Notifications',bc:'',btn:'Mark All Read'},
+};
+
+document.querySelectorAll('.nav-item[data-page]').forEach(el=>{
+  el.addEventListener('click',()=>navigate(el.dataset.page));
+});
+document.getElementById('primary-btn').addEventListener('click',()=>showToast(cfg[cur].btn+' — form opened.'));
+
+function navigate(page){
+  cur=page;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav-item[data-page="'+page+'"]').classList.add('active');
+  const c=cfg[page];
+  document.getElementById('page-title').textContent=c.title;
+  document.getElementById('breadcrumb').textContent=c.bc;
+  document.getElementById('primary-btn-label').textContent=c.btn;
+  const el=document.getElementById('page-content');
+  el.innerHTML='<div class="page-view">'+renderPage(page)+'</div>';
+  el.scrollTop=0;
+  el.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
+    this.closest('.tabs').querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  }));
+  el.querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',function(){this.classList.toggle('on')}));
+  el.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',function(){
+    this.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+    this.classList.add('sel');
+  }));
+}
+
+function showToast(msg,type){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');t.className='toast';
+  const color=type==='danger'?'var(--danger)':type==='warn'?'var(--warn)':'var(--accent)';
+  const icon=type==='danger'?'ti-circle-x':type==='warn'?'ti-alert-circle':'ti-circle-check';
+  t.innerHTML=`<i class="ti ${icon}" style="color:${color};font-size:15px"></i>${msg}`;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
+}
+
+/* ── PROFILE MODAL ── */
+let curProfileTab='info';
+
+function openProfile(){
+  document.getElementById('profile-modal').classList.add('open');
+  switchProfileTab('info');
+  document.getElementById('profile-tabs').querySelectorAll('.modal-tab').forEach(t=>{
+    t.addEventListener('click',function(){switchProfileTab(this.dataset.ptab);});
+  });
+}
+function closeProfile(){
+  document.getElementById('profile-modal').classList.remove('open');
+}
+document.getElementById('profile-modal').addEventListener('click',function(e){
+  if(e.target===this)closeProfile();
+});
+
+function switchProfileTab(tab){
+  curProfileTab=tab;
+  document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.modal-tab[data-ptab="'+tab+'"]').classList.add('active');
+  document.getElementById('profile-tab-content').innerHTML=renderProfileTab(tab);
+  document.getElementById('profile-tab-content').querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',function(){this.classList.toggle('on')}));
+}
+
+function renderProfileTab(tab){
+  if(tab==='info') return profileInfo();
+  if(tab==='security') return profileSecurity();
+  if(tab==='preferences') return profilePrefs();
+  if(tab==='activity') return profileActivity();
+  return '';
+}
+
+function profileInfo(){
+  return`
+  <div class="profile-hero">
+    <div class="profile-avatar-big">AS</div>
+    <div>
+      <div class="profile-name">Arjun Singh</div>
+      <div class="profile-role-badge"><i class="ti ti-briefcase" style="font-size:11px"></i>Manager</div>
+      <div class="profile-dept">Operations Department · Joined Mar 2022</div>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Arjun"></div>
+    <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Singh"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" value="arjun.singh@indusops.com"></div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" value="+91 98765 43210"></div>
+    <div class="form-group"><label class="form-label">Employee ID</label><input class="form-input" value="EMP-0024" readonly style="opacity:0.6;cursor:not-allowed"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label class="form-label">Department</label><input class="form-input" value="Operations" readonly style="opacity:0.6;cursor:not-allowed"></div>
+    <div class="form-group"><label class="form-label">Location</label><input class="form-input" value="Warehouse B, Building C" readonly style="opacity:0.6;cursor:not-allowed"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Bio / Notes</label><textarea class="form-input" placeholder="Add a short bio or notes about yourself…">Operations Manager with 6 years of experience in manufacturing safety and compliance. Overseeing Warehouse B and Building C operations.</textarea></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn btn-primary" onclick="showToast('Profile updated successfully.');closeProfile()"><i class="ti ti-check" style="font-size:13px"></i>Save Changes</button>
+    <button class="btn btn-ghost" onclick="closeProfile()">Cancel</button>
+  </div>`;
+}
+
+function profileSecurity(){
+  return`
+  <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text2);display:flex;gap:8px">
+    <i class="ti ti-lock" style="color:var(--accent);flex-shrink:0;font-size:15px"></i>
+    <span>Last password change: <strong style="color:var(--text)">42 days ago</strong> · Last login: <strong style="color:var(--text)">Today 08:22</strong> from 192.168.1.45</span>
+  </div>
+  <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="Enter your current password"></div>
+  <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Minimum 8 characters" id="new-pw"></div>
+  <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-input" type="password" placeholder="Repeat new password"></div>
+  <div style="margin-bottom:14px">
+    <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Password Strength</div>
+    <div style="display:flex;gap:4px">
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--danger)"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--warn)"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)"></div>
+    </div>
+    <div style="font-size:10px;color:var(--warn);margin-top:4px;font-family:var(--font-mono)">Fair — add numbers and symbols</div>
+  </div>
+  <button class="btn btn-primary" onclick="showToast('Password updated successfully.');closeProfile()"><i class="ti ti-lock" style="font-size:13px"></i>Update Password</button>
+  <div class="divider"></div>
+  <div class="card-title" style="margin-bottom:12px">Two-Factor Authentication</div>
+  <div class="stat-row"><div class="stat-label">Authenticator App (TOTP)</div><span class="badge b-danger">Not Enabled</span></div>
+  <div class="stat-row"><div class="stat-label">SMS Verification</div><span class="badge b-neutral">Optional</span></div>
+  <div style="margin-top:12px"><button class="btn btn-ghost"><i class="ti ti-shield-check" style="font-size:13px"></i>Enable 2FA</button></div>
+  <div class="divider"></div>
+  <div class="card-title" style="margin-bottom:12px">Active Sessions</div>
+  ${sessionRow('Chrome · Windows 11','192.168.1.45','Today 08:22','Current','b-success')}
+  ${sessionRow('Safari · iPhone 14','10.0.0.12','Yesterday 21:10','','b-neutral')}`;
+}
+
+function sessionRow(device,ip,time,label,badge){
+  return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+    <i class="ti ti-device-laptop" style="font-size:16px;color:var(--text3)"></i>
+    <div style="flex:1"><div style="font-size:12px;color:var(--text)">${device}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${ip} · ${time}</div></div>
+    ${label?`<span class="badge ${badge}">${label}</span>`:'<button class="btn btn-danger-outline btn-sm">Revoke</button>'}
+  </div>`;
+}
+
+function profilePrefs(){
+  function tRow(l,on){return`<div class="stat-row"><div class="stat-label">${l}</div><div class="toggle ${on?'on':''}"></div></div>`;}
+  return`
+  <div class="card-title" style="margin-bottom:12px">Notification Preferences</div>
+  ${tRow('Task assigned to me',true)}
+  ${tRow('Inspection due reminder',true)}
+  ${tRow('Incident reported in my dept.',true)}
+  ${tRow('Asset maintenance due',true)}
+  ${tRow('Daily summary email',false)}
+  ${tRow('Weekly performance digest',true)}
+  ${tRow('Push notifications (browser)',false)}
+  <div class="divider"></div>
+  <div class="card-title" style="margin-bottom:12px">Display & Language</div>
+  <div class="form-row" style="margin-bottom:12px">
+    <div class="form-group"><label class="form-label">Language</label>
+      <select class="form-input form-select"><option>English (India)</option><option>Hindi</option><option>English (US)</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Date Format</label>
+      <select class="form-input form-select"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select>
+    </div>
+  </div>
+  <div class="form-row" style="margin-bottom:12px">
+    <div class="form-group"><label class="form-label">Timezone</label>
+      <select class="form-input form-select"><option>Asia/Kolkata (IST +5:30)</option><option>UTC</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Theme</label>
+      <select class="form-input form-select"><option>Dark (current)</option><option>Light</option><option>System</option></select>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="showToast('Preferences saved.');closeProfile()"><i class="ti ti-check" style="font-size:13px"></i>Save Preferences</button>`;
+}
+
+function profileActivity(){
+  const items=[
+    ['ti-circle-check','var(--success)','rgba(34,197,94,0.1)','Completed task: Fix leaking valve — Bay 3','Today 10:45'],
+    ['ti-clipboard-check','var(--accent)','rgba(59,130,246,0.1)','Reviewed inspection: Fire Safety Check Floor 3','Today 09:30'],
+    ['ti-alert-triangle','var(--warn)','rgba(234,179,8,0.1)','Opened incident INC-0042: Forklift near-miss','Today 09:15'],
+    ['ti-user-check','var(--teal)','rgba(20,184,166,0.1)','Assigned task to Priya Mehta: PPE Audit','Yesterday 16:00'],
+    ['ti-login','var(--text3)','var(--bg3)','Logged in from Chrome · 192.168.1.45','Today 08:22'],
+    ['ti-file-analytics','var(--accent2)','rgba(6,182,212,0.1)','Exported Inspection Report — May 2025','Yesterday 14:20'],
+    ['ti-circle-check','var(--success)','rgba(34,197,94,0.1)','Closed incident INC-0037: Machine malfunction','27 May 17:35'],
+    ['ti-clipboard-check','var(--accent)','rgba(59,130,246,0.1)','Scheduled inspection: Bay Safety Walkthrough','26 May 11:00'],
+  ];
+  return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:500;color:var(--text)">Recent Activity</div>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Last 7 days</span>
+  </div>
+  <div style="display:flex;flex-direction:column;position:relative">
+    <div style="position:absolute;left:14px;top:0;bottom:0;width:1px;background:var(--border)"></div>
+    ${items.map(([icon,color,bg,title,time])=>`
+    <div style="display:flex;gap:12px;padding:8px 0;align-items:flex-start">
+      <div style="width:28px;height:28px;border-radius:50%;background:${bg};border:2px solid var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1">
+        <i class="ti ${icon}" style="font-size:12px;color:${color}"></i>
+      </div>
+      <div style="flex:1;padding-top:4px">
+        <div style="font-size:12px;color:var(--text)">${title}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">${time}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* ── HELPERS ── */
+function scopeBanner(msg){
+  return`<div class="scope-banner"><i class="ti ti-lock-open"></i><span>${msg}</span></div>`;
+}
+function kpi(label,val,sub,color,icon,updown){
+  return`<div class="kpi"><div class="kpi-accent" style="background:${color}"></div>
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-value">${val}</div>
+    <div class="kpi-sub ${updown||''}">${sub}</div>
+    <i class="ti ${icon} kpi-icon" style="color:${color}"></i>
+  </div>`;
+}
+function barChart(data,labels,color){
+  const mx=Math.max(...data);
+  return`<div class="bar-chart">${data.map((v,i)=>`<div class="bar-col"><div class="bar" style="height:${(v/mx)*100}%;background:${color};opacity:${0.4+0.6*(v/mx)}"></div><div class="bar-label">${labels[i]}</div></div>`).join('')}</div>`;
+}
+function priBar(label,n,pct,color){
+  return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text2)">${label}</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text3)">${n}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+}
+function actItem(iconClass,iconColor,bgColor,title,meta,badge,bval){
+  return`<div class="act-item"><div class="act-icon" style="background:${bgColor}"><i class="ti ${iconClass}" style="font-size:14px;color:${iconColor}"></i></div><div class="act-info"><div class="act-title">${title}</div><div class="act-meta">${meta}</div></div><span class="badge ${badge}">${bval}</span></div>`;
+}
+function memberAvatar(initials,name,role,status,tasks){
+  const colors={'Supervisor':'#3b82f6','Technician':'#a855f7','Worker':'#14b8a6','Inspector':'#f97316'};
+  const c=colors[role]||'#7a85a3';
+  const sb={Active:'b-success',Away:'b-warn','Off Shift':'b-neutral'};
+  return`<div class="member-card"><div class="avatar" style="background:${c}22;color:${c}">${initials}</div>
+    <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:var(--text)">${name}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${role}</div></div>
+    <div style="text-align:right"><span class="badge ${sb[status]||'b-neutral'}">${status}</span><div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--font-mono)">${tasks} tasks</div></div>
+  </div>`;
+}
+
+/* ── PAGE RENDERS ── */
+function renderPage(p){
+  const r={dashboard,myteam,inspections,tasks,incidents,assets,reports,notifications};
+  return r[p]?r[p]():'';
+}
+
+function dashboard(){
+  return`
+  ${scopeBanner('Showing data for <span class="scope-pill">Operations Dept.</span> — Warehouse B, Building C, Bay 1–5 only')}
+  <div class="kpi-grid">
+    ${kpi('My Team Size','12','2 off shift today','var(--accent)','ti-users','')}
+    ${kpi('Open Tasks','18','4 overdue','var(--warn)','ti-checklist','kpi-down')}
+    ${kpi('Inspections Due','8','3 due today','var(--accent2)','ti-clipboard-check','')}
+    ${kpi('Open Incidents','2','1 high severity','var(--danger)','ti-alert-triangle','kpi-down')}
+  </div>
+  <div class="kpi-grid">
+    ${kpi('Pass Rate (Dept)','89.4%','↑ 3% this week','var(--success)','ti-shield-check','kpi-up')}
+    ${kpi('Tasks Completed','84','This month','var(--success)','ti-circle-check','kpi-up')}
+    ${kpi('Assets Under Me','47','3 service due','var(--warn)','ti-tools','')}
+    ${kpi('Avg Response Time','1.8h','↓ 0.4h improvement','var(--teal)','ti-clock-bolt','kpi-up')}
+  </div>
+  <div class="grid-3" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Dept. Inspection Trend</div><div class="card-sub">LAST 7 DAYS · OPERATIONS</div></div></div>
+      ${barChart([5,8,4,9,7,11,8],['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],'var(--accent)')}
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Task Status</div></div>
+      <div class="donut-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="28" fill="none" stroke="#1c2030" stroke-width="11"/>
+          <circle cx="40" cy="40" r="28" fill="none" stroke="#22c55e" stroke-width="11" stroke-dasharray="88 88" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="28" fill="none" stroke="#3b82f6" stroke-width="11" stroke-dasharray="35 141" stroke-dashoffset="-88" transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="28" fill="none" stroke="#eab308" stroke-width="11" stroke-dasharray="28 148" stroke-dashoffset="-123" transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="28" fill="none" stroke="#ef4444" stroke-width="11" stroke-dasharray="25 151" stroke-dashoffset="-151" transform="rotate(-90 40 40)"/>
+          <text x="40" y="44" text-anchor="middle" font-size="12" fill="#dde3f0" font-family="Syne,sans-serif" font-weight="700">84</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>Completed — 84</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>In Progress — 11</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div>Pending — 7</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Overdue — 4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">My Team — Today</div><button class="btn btn-ghost btn-sm" onclick="navigate('myteam')">View all</button></div>
+      <div class="act-list">
+        ${actItem('ti-user-check','var(--success)','rgba(34,197,94,0.1)','Priya Mehta — Supervisor','On duty · Warehouse B','b-success','Active')}
+        ${actItem('ti-user-check','var(--success)','rgba(34,197,94,0.1)','Ravi Tiwari — Technician','On duty · Bay 3','b-success','Active')}
+        ${actItem('ti-user-minus','var(--warn)','rgba(234,179,8,0.1)','Suresh M. — Worker','Away · Bay 1','b-warn','Away')}
+        ${actItem('ti-user-x','var(--text3)','var(--bg3)','Mohan Raj — Worker','Off shift today','b-neutral','Off Shift')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Overdue / Urgent</div><span class="badge b-danger">4 items</span></div>
+      <div class="act-list">
+        ${actItem('ti-clock-exclamation','var(--danger)','rgba(239,68,68,0.1)','Replace fire ext. B12 — Priya M.','Due: Today','b-danger','Overdue')}
+        ${actItem('ti-alert-triangle','var(--warn)','rgba(234,179,8,0.1)','PPE audit — Ravi T.','Due: Today','b-warn','Due Today')}
+        ${actItem('ti-clipboard-x','var(--danger)','rgba(239,68,68,0.1)','Scaffold inspection — Site A','Due: Yesterday','b-danger','Overdue')}
+        ${actItem('ti-tools','var(--warn)','rgba(234,179,8,0.1)','Generator GEN-1 service','Due: 28 May','b-warn','Overdue')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function myteam(){
+  return`
+  ${scopeBanner('Showing team members under <span class="scope-pill">Operations Dept.</span> only — you cannot manage users in other departments')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('Team Members','12','Reporting to you','var(--accent)','ti-users','')}
+    ${kpi('On Duty Now','9','3 off today','var(--success)','ti-user-check','')}
+    ${kpi('Avg Tasks / Person','5.8','This week','var(--accent2)','ti-checklist','')}
+    ${kpi('Open Assignments','18','Across team','var(--warn)','ti-list-check','')}
+  </div>
+  <div class="grid-2" style="margin-bottom:12px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Supervisors & Technicians</div>
+      ${memberAvatar('PM','Priya Mehta','Supervisor','Active','6')}
+      ${memberAvatar('RT','Ravi Tiwari','Technician','Active','4')}
+      ${memberAvatar('AP','Aisha Patel','Inspector','Active','5')}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Workers</div>
+      ${memberAvatar('NK','Neha Kumar','Worker','Active','3')}
+      ${memberAvatar('SM','Suresh M.','Worker','Away','2')}
+      ${memberAvatar('MR','Mohan Raj','Worker','Off Shift','0')}
+      ${memberAvatar('VK','Vikram K.','Worker','Active','4')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Team Performance — This Month</div></div>
+    <table class="data-table">
+      <thead><tr><th>Member</th><th>Role</th><th>Tasks Done</th><th>On Time %</th><th>Inspections</th><th>Incidents</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="td-p">Priya Mehta</td><td>Supervisor</td><td style="font-family:var(--font-mono)">24</td><td><span class="badge b-success">96%</span></td><td style="font-family:var(--font-mono)">8</td><td style="font-family:var(--font-mono)">0</td><td><span class="badge b-success">Active</span></td></tr>
+        <tr><td class="td-p">Ravi Tiwari</td><td>Technician</td><td style="font-family:var(--font-mono)">18</td><td><span class="badge b-success">89%</span></td><td style="font-family:var(--font-mono)">6</td><td style="font-family:var(--font-mono)">1</td><td><span class="badge b-success">Active</span></td></tr>
+        <tr><td class="td-p">Neha Kumar</td><td>Worker</td><td style="font-family:var(--font-mono)">12</td><td><span class="badge b-warn">74%</span></td><td style="font-family:var(--font-mono)">3</td><td style="font-family:var(--font-mono)">1</td><td><span class="badge b-success">Active</span></td></tr>
+        <tr><td class="td-p">Suresh M.</td><td>Worker</td><td style="font-family:var(--font-mono)">9</td><td><span class="badge b-warn">80%</span></td><td style="font-family:var(--font-mono)">2</td><td style="font-family:var(--font-mono)">0</td><td><span class="badge b-warn">Away</span></td></tr>
+        <tr><td class="td-p">Mohan Raj</td><td>Worker</td><td style="font-family:var(--font-mono)">7</td><td><span class="badge b-danger">61%</span></td><td style="font-family:var(--font-mono)">1</td><td style="font-family:var(--font-mono)">2</td><td><span class="badge b-neutral">Off Shift</span></td></tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function inspections(){
+  function row(n,t,w,l,d,s,st,b){return`<tr><td class="td-p">${n}</td><td>${t}</td><td>${w}</td><td style="font-size:11px;color:var(--text2)">${l}</td><td style="font-family:var(--font-mono);font-size:11px">${d}</td><td style="font-family:var(--font-mono)">${s}</td><td><span class="badge ${b}">${st}</span></td><td><button class="btn btn-ghost btn-sm">Review</button></td></tr>`;}
+  return`
+  ${scopeBanner('Showing inspections for <span class="scope-pill">Operations Dept.</span> — Warehouse B, Building C, Bay 1–5')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('Scheduled','8','3 due today','var(--accent)','ti-calendar','')}
+    ${kpi('In Progress','3','Active now','var(--warn)','ti-loader','')}
+    ${kpi('Completed','54','This month','var(--success)','ti-circle-check','kpi-up')}
+    ${kpi('Pass Rate','89.4%','Dept. average','var(--teal)','ti-percentage','')}
+  </div>
+  <div class="tabs"><div class="tab active">All</div><div class="tab">Scheduled</div><div class="tab">In Progress</div><div class="tab">Completed</div><div class="tab">Failed</div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Inspection Log</div>
+      <select class="form-input form-select" style="width:auto;font-size:12px;padding:5px 24px 5px 8px"><option>All Locations</option><option>Warehouse B</option><option>Building C</option><option>Bay 1–5</option></select>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Inspection</th><th>Template</th><th>Assignee</th><th>Location</th><th>Due</th><th>Score</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${row('Fire Safety Check','Fire & Safety v3','Priya Mehta','Warehouse B','Today','94%','Passed','b-success')}
+        ${row('Equipment Walkthrough','Machinery Audit','Ravi Tiwari','Bay 3','Today','—','In Progress','b-warn')}
+        ${row('Chemical Storage Audit','Hazmat Protocol','Neha Kumar','Warehouse B','Yesterday','62%','Failed','b-danger')}
+        ${row('Electrical Panel Check','Electrical v2','Ravi Tiwari','Building C','28 May','100%','Passed','b-success')}
+        ${row('Bay Safety Walkthrough','General Safety','Suresh M.','Bay 1','01 Jun','—','Scheduled','b-neutral')}
+        ${row('Forklift Pre-Use Check','Fleet Safety','Mohan Raj','Warehouse B','02 Jun','—','Scheduled','b-neutral')}
+        ${row('PPE Compliance Check','PPE Audit v1','Aisha Patel','Building C','Today','—','In Progress','b-warn')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function tasks(){
+  function row(n,w,p,d,st,b){const pc={Critical:'b-danger',High:'b-orange',Medium:'b-warn',Low:'b-info'};return`<tr><td class="td-p" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n}</td><td>${w}</td><td><span class="badge ${pc[p]}">${p}</span></td><td style="font-family:var(--font-mono);font-size:11px">${d}</td><td><span class="badge ${b}">${st}</span></td><td><button class="btn btn-ghost btn-sm">Edit</button></td></tr>`;}
+  return`
+  ${scopeBanner('Managing tasks for <span class="scope-pill">Operations Dept.</span> only')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('Total Open','18','Across my team','var(--accent)','ti-list-check','')}
+    ${kpi('Due Today','6','Action needed','var(--warn)','ti-calendar-event','')}
+    ${kpi('Overdue','4','Escalation needed','var(--danger)','ti-clock-x','kpi-down')}
+    ${kpi('Completed','84','This month','var(--success)','ti-circle-check','kpi-up')}
+  </div>
+  <div class="grid-2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Task List</div>
+        <select class="form-input form-select" style="width:auto;font-size:11px;padding:4px 20px 4px 8px"><option>All Members</option><option>Priya Mehta</option><option>Ravi Tiwari</option></select>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Assigned To</th><th>Priority</th><th>Due</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${row('Fix leaking valve — Bay 3','Ravi T.','High','Today','In Progress','b-warn')}
+          ${row('Replace fire extinguisher B12','Priya M.','Critical','Today','Overdue','b-danger')}
+          ${row('Label new chemical bins','Neha K.','Medium','01 Jun','Pending','b-neutral')}
+          ${row('Audit PPE inventory','Priya M.','High','02 Jun','In Progress','b-warn')}
+          ${row('Calibrate pressure gauges','Ravi T.','Medium','04 Jun','Pending','b-neutral')}
+          ${row('Update forklift logbook','Mohan R.','Low','05 Jun','Pending','b-neutral')}
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">By Priority</div></div>
+        ${priBar('Critical',2,40,'var(--danger)')}
+        ${priBar('High',5,50,'var(--accent3)')}
+        ${priBar('Medium',7,35,'var(--warn)')}
+        ${priBar('Low',4,20,'var(--accent)')}
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Completion — 7 days</div></div>
+        ${barChart([4,6,3,8,5,7,6],['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],'var(--teal)')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function incidents(){
+  function row(id,t,who,sev,loc,when,st){
+    const sc={High:'b-danger',Medium:'b-warn',Low:'b-info'};
+    const ss={Open:'b-danger',Investigating:'b-warn',Resolved:'b-success',Closed:'b-neutral'};
+    return`<tr><td style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${id}</td><td class="td-p">${t}</td><td>${who}</td><td><span class="badge ${sc[sev]}">${sev}</span></td><td style="font-size:11px;color:var(--text2)">${loc}</td><td style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${when}</td><td><span class="badge ${ss[st]}">${st}</span></td><td><button class="btn btn-ghost btn-sm">View</button></td></tr>`;
+  }
+  return`
+  ${scopeBanner('Showing incidents within <span class="scope-pill">Operations Dept.</span> — Warehouse B, Building C, Bay 1–5')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('Open','2','1 high severity','var(--danger)','ti-alert-triangle','')}
+    ${kpi('Investigating','1','In progress','var(--warn)','ti-search','')}
+    ${kpi('Resolved','11','This month','var(--success)','ti-check','kpi-up')}
+    ${kpi('Avg Resolution','2.8d','Dept. average','var(--accent2)','ti-clock','')}
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-header"><div class="card-title">Incident Log — My Department</div>
+      <div style="display:flex;gap:6px"><span class="chip sel">All</span><span class="chip">Open</span><span class="chip">Investigating</span><span class="chip">Resolved</span></div>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>Title</th><th>Reported By</th><th>Severity</th><th>Location</th><th>Date</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${row('INC-0042','Forklift near-miss','Priya Mehta','High','Warehouse B','Today 09:14','Investigating')}
+        ${row('INC-0041','Electrical fault','Ravi Tiwari','Medium','Building C','Today 08:40','Open')}
+        ${row('INC-0039','PPE non-compliance','Neha Kumar','Medium','Bay 4','Yesterday','Resolved')}
+        ${row('INC-0037','Machine malfunction','Ravi Tiwari','High','Bay 5','27 May','Resolved')}
+        ${row('INC-0035','Slip hazard — spill','Suresh M.','Low','Warehouse B','25 May','Resolved')}
+      </tbody>
+    </table>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">By Severity</div></div>
+      ${priBar('High',3,50,'var(--danger)')}
+      ${priBar('Medium',5,42,'var(--warn)')}
+      ${priBar('Low',3,25,'var(--accent)')}
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Incident Trend — 7 days</div></div>
+      ${barChart([2,0,1,1,2,0,1],['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],'var(--accent3)')}
+    </div>
+  </div>`;
+}
+
+function assets(){
+  function row(id,n,cat,loc,last,nxt,st){
+    const s={Operational:'b-success','Service Due':'b-warn',Overdue:'b-danger','Out of Service':'b-danger'};
+    return`<tr><td style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${id}</td><td class="td-p">${n}</td><td>${cat}</td><td style="font-size:11px;color:var(--text2)">${loc}</td><td style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${last}</td><td style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${nxt}</td><td><span class="badge ${s[st]||'b-neutral'}">${st}</span></td></tr>`;
+  }
+  return`
+  ${scopeBanner('Showing assets in <span class="scope-pill">Warehouse B · Building C · Bay 1–5</span> only')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('My Assets','47','Dept. total','var(--accent)','ti-package','')}
+    ${kpi('Operational','38','80.9% uptime','var(--success)','ti-circle-check','')}
+    ${kpi('Service Due','7','Next 30 days','var(--warn)','ti-tools','')}
+    ${kpi('Out of Service','2','Log issue','var(--danger)','ti-circle-x','')}
+  </div>
+  <div class="tabs"><div class="tab active">All Assets</div><div class="tab">Service Due</div><div class="tab">Out of Service</div></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Asset Registry — My Locations</div><button class="btn btn-ghost btn-sm"><i class="ti ti-qrcode"></i>Scan QR</button></div>
+    <table class="data-table">
+      <thead><tr><th>Asset ID</th><th>Name</th><th>Category</th><th>Location</th><th>Last Service</th><th>Next Service</th><th>Status</th></tr></thead>
+      <tbody>
+        ${row('AST-001','Forklift MHE-4','Vehicles','Warehouse B','12 Apr','12 Jul','Operational')}
+        ${row('AST-002','Air Compressor AC-7','Machinery','Bay 3','01 May','01 Aug','Operational')}
+        ${row('AST-003','Conveyor Belt CB-2','Equipment','Assembly L1','15 Mar','15 Jun','Service Due')}
+        ${row('AST-004','Generator GEN-1','Electrical','Utility Room','10 Jan','10 Apr','Overdue')}
+        ${row('AST-008','Pallet Jack PJ-3','Vehicles','Warehouse B','20 Apr','20 Oct','Operational')}
+        ${row('AST-009','Welding Station WS-2','Equipment','Bay 5','08 May','08 Nov','Operational')}
+        ${row('AST-011','CCTV Array Zone-4','Security','Building C','22 Apr','22 Oct','Out of Service')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function reports(){
+  return`
+  ${scopeBanner('Reports filtered to <span class="scope-pill">Operations Dept.</span> data only')}
+  <div class="kpi-grid" style="margin-bottom:16px">
+    ${kpi('Reports This Month','28','My dept. only','var(--accent)','ti-file-analytics','')}
+    ${kpi('Scheduled Reports','4','Auto-generated','var(--accent2)','ti-clock','')}
+    ${kpi('PDF Exports','14','Last 30 days','var(--success)','ti-file-type-pdf','')}
+    ${kpi('Excel Exports','10','Ops team','var(--teal)','ti-table','')}
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Inspection Summary</div></div>
+      <div class="tabs" style="margin-bottom:12px"><div class="tab active" style="padding:6px 12px">By Location</div><div class="tab" style="padding:6px 12px">By Member</div><div class="tab" style="padding:6px 12px">By Week</div></div>
+      <table class="data-table">
+        <thead><tr><th>Location</th><th>Inspections</th><th>Pass Rate</th><th>Issues</th></tr></thead>
+        <tbody>
+          <tr><td class="td-p">Warehouse B</td><td style="font-family:var(--font-mono)">18</td><td><span class="badge b-success">92%</span></td><td style="font-family:var(--font-mono);color:var(--danger)">4</td></tr>
+          <tr><td class="td-p">Building C</td><td style="font-family:var(--font-mono)">14</td><td><span class="badge b-warn">81%</span></td><td style="font-family:var(--font-mono);color:var(--warn)">8</td></tr>
+          <tr><td class="td-p">Bay 1–5</td><td style="font-family:var(--font-mono)">12</td><td><span class="badge b-success">91%</span></td><td style="font-family:var(--font-mono);color:var(--success)">3</td></tr>
+          <tr><td class="td-p">Assembly L1</td><td style="font-family:var(--font-mono)">10</td><td><span class="badge b-danger">74%</span></td><td style="font-family:var(--font-mono);color:var(--danger)">9</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm"><i class="ti ti-file-type-pdf"></i>PDF</button>
+        <button class="btn btn-ghost btn-sm"><i class="ti ti-table"></i>Excel</button>
+        <button class="btn btn-ghost btn-sm"><i class="ti ti-file-spreadsheet"></i>CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Team Performance</div></div>
+      ${barChart([24,18,12,9,7],['Priya','Ravi','Neha','Suresh','Mohan'],'var(--accent)')}
+      <div style="margin-top:14px">
+        <div class="stat-row"><div class="stat-label">Total Tasks Completed</div><div class="stat-val">84</div></div>
+        <div class="stat-row"><div class="stat-label">On-Time Rate</div><div class="stat-val" style="color:var(--success)">88%</div></div>
+        <div class="stat-row"><div class="stat-label">Incidents Reported</div><div class="stat-val">11</div></div>
+        <div class="stat-row"><div class="stat-label">Inspections Passed</div><div class="stat-val">48 / 54</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function notifications(){
+  function notif(icon,color,bg,title,meta,badge,bval,read){
+    return`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:${read?'transparent':'rgba(59,130,246,0.04)'};border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background='${read?'transparent':'rgba(59,130,246,0.04)'}'">
+      <div style="width:34px;height:34px;border-radius:8px;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ${icon}" style="font-size:15px;color:${color}"></i></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--text);font-weight:${read?400:500}">${title}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">${meta}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <span class="badge ${badge}">${bval}</span>
+        ${read?'':'<div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:4px"></div>'}
+      </div>
+    </div>`;
+  }
+  return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:600;color:var(--text)">All Notifications</div>
+    <button class="btn btn-ghost btn-sm" onclick="showToast('All notifications marked as read.')"><i class="ti ti-checks"></i>Mark all read</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    ${notif('ti-clock-exclamation','var(--danger)','rgba(239,68,68,0.1)','Overdue: Replace fire extinguisher B12','Task overdue — Priya Mehta · Today 09:00','b-danger','Overdue',false)}
+    ${notif('ti-alert-triangle','var(--warn)','rgba(234,179,8,0.1)','New incident reported — Forklift near-miss','INC-0042 · Warehouse B · Today 09:14','b-warn','Incident',false)}
+    ${notif('ti-clipboard-check','var(--accent)','rgba(59,130,246,0.1)','Inspection due today — PPE Compliance Check','Assigned to Aisha Patel · Building C','b-info','Due Today',false)}
+    ${notif('ti-tools','var(--warn)','rgba(234,179,8,0.1)','Asset service due — Conveyor Belt CB-2','AST-003 · Assembly L1 · Due 15 Jun','b-warn','Service Due',false)}
+    ${notif('ti-user-check','var(--success)','rgba(34,197,94,0.1)','Task completed — Bay Safety Walkthrough','Completed by Suresh M. · Yesterday 17:30','b-success','Done',false)}
+    ${notif('ti-circle-check','var(--success)','rgba(34,197,94,0.1)','Inspection passed — Fire Safety Check','Score: 94% · Priya Mehta · 29 May','b-success','Passed',true)}
+    ${notif('ti-message','var(--teal)','rgba(20,184,166,0.1)','Comment on INC-0039 — PPE non-compliance','Added by Neha Kumar · 28 May 14:22','b-teal','Comment',true)}
+  </div>`;
+}
+
+// INIT
+navigate('dashboard');
+</script>
+</body>
+</html>
